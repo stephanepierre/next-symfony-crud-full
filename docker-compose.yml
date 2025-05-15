@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: symfony-next-test
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: symfony
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+
+  frontend:
+    build: ./frontend-next
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-next:/app
+    working_dir: /app
+    command: "npm run dev"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend-symfony
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-symfony:/app
+    working_dir: /app
+    environment:
+      APP_ENV: dev
+    command: php -S 0.0.0.0:8000 -t public
+    depends_on:
+      - db
+
+volumes:
+  db_data:

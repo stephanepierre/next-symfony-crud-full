@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+vendor/
+var/
+.idea/
+*.log
+docker/phpmyadmin/
+db_data/
