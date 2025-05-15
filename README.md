@@ -68,10 +68,9 @@ MySQL tourne dans Docker (service: db)
 
 Symfony se connecte via DATABASE_URL dans .env :
 
-dotenv
-Copier
-Modifier
+```bash
 DATABASE_URL="mysql://symfony:symfony@db:3306/symfony-next-test?serverVersion=8.0"
+```
 Les données sont stockées dans un volume Docker (db_data).
 
 ## ✅ À venir
