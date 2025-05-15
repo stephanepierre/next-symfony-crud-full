@@ -31,8 +31,6 @@ next-symfony-crud-full/
 > https://www.docker.com/products/docker-desktop/
 
 ### 2. Lancer le projet
-
-```bash
 make up
 
 --- 
