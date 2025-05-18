@@ -29,6 +29,7 @@ next-symfony-crud-full/
 
 ### 1. Installer Docker Desktop (si ce n’est pas déjà fait)
 > https://www.docker.com/products/docker-desktop/
+> installer make: npm install make
 
 ### 2. Lancer le projet
 make up

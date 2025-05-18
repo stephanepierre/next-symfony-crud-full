@@ -19,6 +19,12 @@ install-backend:
 	docker compose exec backend composer install
 
 # ⚙️ Symfony – Migration et Fixtures
+db-table-create:
+	docker compose exec backend php bin/console make:entity
+
+migration:
+	docker compose exec backend php bin/console make:migration
+
 migrate:
 	docker compose exec backend php bin/console doctrine:migrations:migrate
 
