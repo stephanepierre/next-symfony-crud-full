@@ -1,42 +1,47 @@
-# 🚀 Démarrer/Arrêter les conteneurs
+# Makefile : outils full-stack Symfony + Next.js + MySQL
+
+# Variables
+DB_CONTAINER=next-symfony-crud-full-db-1
+BACKEND_CONTAINER=next-symfony-crud-full-backend-1
+DUMP_FILE=dump.sql
+
+## Lancer les conteneurs
 up:
-	docker compose up
+	docker-compose up -d
 
+## Arrêter les conteneurs
 down:
-	docker compose down
+	docker-compose down
 
+## Rebuild total sans perte de données (si dump.sql est présent)
 rebuild:
-	docker compose up --build
+	docker-compose down --remove-orphans
+	docker-compose build --no-cache
+	docker-compose up -d
+	$(MAKE) restore-or-migrate
 
-reset-db:
-	docker compose down -v
+## Supprimer tout et tout recréer proprement
+reset:
+	docker-compose down --volumes --remove-orphans
+	docker volume rm next-symfony-crud-full_db_data || true
+	docker-compose build --no-cache
+	docker-compose up -d
+	$(MAKE) migrate
+	$(MAKE) fixtures
 
-# 🛠️ Installation des dépendances
-install-frontend:
-	docker compose exec frontend npm install
+## Dump (sauvegarde) de la BDD
+dump-db:
+	docker exec -i next-symfony-crud-full-db-1 mysqldump -u root -proot symfony-next-test > dump.sql
 
-install-backend:
-	docker compose exec backend composer install
-
-# ⚙️ Symfony – Migration et Fixtures
-db-table-create:
-	docker compose exec backend php bin/console make:entity
-
-migration:
-	docker compose exec backend php bin/console make:migration
+restore-db:
+	docker exec -i next-symfony-crud-full-db-1 mysql -u root -proot symfony-next-test < dump.sql
 
 migrate:
-	docker compose exec backend php bin/console doctrine:migrations:migrate
+	docker exec -it next-symfony-crud-full-backend-1 php bin/console doctrine:migrations:migrate --no-interaction
 
 fixtures:
-	docker compose exec backend php bin/console doctrine:fixtures:load --no-interaction
+	docker exec -it next-symfony-crud-full-backend-1 php bin/console doctrine:fixtures:load --no-interaction
 
-# 🐚 Accès shell aux conteneurs
-bash-backend:
-	docker compose exec backend bash
-
-bash-frontend:
-	docker compose exec frontend bash
-
-bash-db:
-	docker compose exec db bash
+## Logs live
+logs:
+	docker-compose logs -f

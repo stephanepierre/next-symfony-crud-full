@@ -56,13 +56,26 @@ make up
 | Démarrer l’environnement	                | make up                   |
 | Rebuilder les conteneurs	                | make rebuild              |
 | Stopper les conteneurs	                | make down                 |
-| Réinitialiser la base	                    | make reset-db             |
-| Installer dépendances Next.js	            | make install-frontend     |
-| Installer dépendances Symfony	            | make install-backend      |
-| Lancer les migrations	                    | make migrate              |
+| Réinitialiser complètement l'environnement| make reset                |
+| Exécuter les migrations Doctrine	        | make migrate              |
 | Charger les fixtures	                    | make fixtures             |
-| Entrer dans le backend (bash)	            | make bash-backend         |   
-| Entrer dans le frontend (bash)	        | make bash-frontend        |
+| Sauvegarder la BDD	                    | make dump-db              |
+| Restaurer la BDD depuis dump.sql	        | make restore-db           |
+| Restaurer ou recréer selon contexte	    | make restore-or-migrate   |
+| Voir les logs Docker en direct	        | make logs                 |
+
+## 🔐 Changement d’ordinateur / backup de base
+### 📤 Sauvegarde (avant de quitter le PC d’origine)
+make dump-db
+Cela crée un fichier dump.sql à la racine du projet contenant toute la base de données.
+
+### 📥 Reprise du projet sur un autre ordinateur
+Copier l’intégralité du dossier (y compris dump.sql)
+
+### Sur la nouvelle machine :
+make rebuild
+➡️ Cela restaure automatiquement la BDD depuis dump.sql
+Sinon, Doctrine lancera les migrations + fixtures pour repartir proprement.
 
 ## 🛠️ Configuration base de données
 MySQL tourne dans Docker (service: db)
