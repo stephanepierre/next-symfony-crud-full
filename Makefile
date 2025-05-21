@@ -1,10 +1,3 @@
-# Makefile : outils full-stack Symfony + Next.js + MySQL
-
-# Variables
-DB_CONTAINER=next-symfony-crud-full-db-1
-BACKEND_CONTAINER=next-symfony-crud-full-backend-1
-DUMP_FILE=dump.sql
-
 ## Lancer les conteneurs
 up:
 	docker-compose up -d
@@ -13,12 +6,11 @@ up:
 down:
 	docker-compose down
 
-## Rebuild total sans perte de données (si dump.sql est présent)
+## Rebuild total sans restauration automatique
 rebuild:
 	docker-compose down --remove-orphans
 	docker-compose build --no-cache
 	docker-compose up -d
-	$(MAKE) restore-or-migrate
 
 ## Supprimer tout et tout recréer proprement
 reset:
@@ -26,22 +18,48 @@ reset:
 	docker volume rm next-symfony-crud-full_db_data || true
 	docker-compose build --no-cache
 	docker-compose up -d
-	$(MAKE) migrate
-	$(MAKE) fixtures
 
 ## Dump (sauvegarde) de la BDD
 dump-db:
 	docker exec -i next-symfony-crud-full-db-1 mysqldump -u root -proot symfony-next-test > dump.sql
 
+## Restauration manuelle de la BDD depuis dump.sql
 restore-db:
 	docker exec -i next-symfony-crud-full-db-1 mysql -u root -proot symfony-next-test < dump.sql
 
+## Exécuter les migrations
 migrate:
 	docker exec -it next-symfony-crud-full-backend-1 php bin/console doctrine:migrations:migrate --no-interaction
 
+## Charger les fixtures
 fixtures:
 	docker exec -it next-symfony-crud-full-backend-1 php bin/console doctrine:fixtures:load --no-interaction
 
 ## Logs live
 logs:
 	docker-compose logs -f
+
+## Commandes d'aide
+help:
+	echo Commandes disponibles :
+
+help-up:
+	echo "  make up           → Lancer les conteneurs"
+
+help-down:
+	echo "  make down         → Stopper les conteneurs"
+
+help-rebuild:
+	echo "  make rebuild      → Rebuild sans perte de données"
+
+help-reset:
+	echo "  make reset        → Reset complet avec migrations et fixtures"
+
+help-restore-db:
+	echo "  make restore-db   → Restaurer la base depuis dump.sql"
+
+help-migrate:
+	echo "  make migrate      → Lancer les migrations"
+
+help-fixtures:
+	echo "  make fixtures     → Charger les fixtures"
